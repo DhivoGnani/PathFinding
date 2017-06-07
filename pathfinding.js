@@ -1,20 +1,75 @@
 /********** Author: Dhivo Gnani **********/ 
 
+// Status enum currently used for BFS 
 var Status = {
 	UNVISITED: 0,
 	VISITING: 1,
 	VISITED: 2
 }
 
+/********** Points in Grid **********/ 
+function Point(xCoord, yCoord) {
+	this.x = xCoord;
+	this.y = yCoord;
+}
+
+Point.prototype.setX = function(xCoord) {
+	this.x = xCoord;
+}
+
+Point.prototype.setY = function(yCoord) {
+	this.y = yCoord;
+}
+
+Point.prototype.getX = function() {
+	return this.x;
+}
+
+Point.prototype.getY = function() {
+	return this.y;
+}
+
+/********** Grid **********/ 
 // Constructor
 function Grid(m,n)
 {
 	this.m = m;
 	this.n = n;
 	this.grid = [];
+	this.obstacles = [];
+}
 
-	// Initialization
-	// FIXME: Move initialization
+Grid.prototype.isNotObstacle = function(xCoord, yCoord) {
+	if (isInvalidCoordinates(xCoord, yCoord)) return null;
+
+	for (var i = 0; i < this.obstacles.length; ++i) {
+		var obstacle = this.obstacles[i]
+		if (obstacle.x == xCoord && obstacle.y == yCoord) return false;
+	}
+	return true;
+}
+
+Grid.prototype.setObstacle = function(xCoord,yCoord) {
+	if (isInvalidCoordinates(xCoord, yCoord)) return false; 
+
+ 	var obstaclePoint = {x: xCoord, y:yCoord};
+ 	this.obstacles.push(obstaclePoint);
+ 	return true;
+}	
+
+Grid.prototype.isInvalidCoordinates = function(xCoord,yCoord) {
+	if (xCoord < 0 || yCoord < 0 || xCoord > m || yCoord > n) {
+		return true;
+	} 
+	return false;
+}
+
+// SSP implemented using BFS
+// TODO: Implement serach using A* or Dijkstra instead?
+Grid.prototype.search = function(start, end)
+{
+	
+	// Initialize status for BFS Search
 	for (var i = 0; i < n; ++i )
 	{
 		this.grid[i] = [];
@@ -23,16 +78,11 @@ function Grid(m,n)
 			this.grid[i][j] =  Status.UNVISITED;
 		}
 	}
-}
 
-
-// SSP implemented using BFS
-// TODO: Implement serach using A* or Dijkstra instead?
-Grid.prototype.search = function(start, end)
-{
     var paths = [];
 	paths.push([start]);
-
+	this.grid[start.x][start.y] = VISITING;
+	
 	while (paths.length != 0)
 	{
 		var path = paths.shift();
@@ -60,6 +110,9 @@ Grid.prototype.search = function(start, end)
 		}
 		this.grid[last_node.x][last_node.y] = Status.VISITED;
 	}
+
+	// No path from start to end
+	return null;
 
 }
 
