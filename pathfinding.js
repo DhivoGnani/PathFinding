@@ -25,45 +25,72 @@ function Grid(m,n)
 	this.m = m; 
 	// number of rows in grid
 	this.n = n;
+	// initialize grid
 	this.grid = [];
+	// obstacles array
 	this.obstacles = [];
 	// path includes diagonal coordinates
 	this.diagonal = true;
 }
 
+// allow or dis-allow diagonal coordinates to be part of path for getPath
 Grid.prototype.enableDiagonal = function(enable) {
 	this.diagonal = enable;
 }
 
-// Grid.prototype.isNotObstacle = function(xCoord, yCoord) {
-// 	if (!isValidCoordinate(xCoord, yCoord)) return null;
-
-// 	for (var i = 0; i < this.obstacles.length; ++i) {
-// 		var obstacle = this.obstacles[i]
-// 		if (obstacle.x == xCoord && obstacle.y == yCoord) return false;
-// 	}
-// 	return true;
-// }
-
-// Grid.prototype.setObstacle = function(xCoord,yCoord) {
-// 	if (!isValidCoordinate(xCoord, yCoord)) return false; 
-
-//  	var obstaclePoint = {x: xCoord, y:yCoord};
-//  	this.obstacles.push(obstaclePoint);
-//  	return true;
-// }	
-
+// check if coordinates are within grid
 Grid.prototype.isValidCoordinate = function(xCoord,yCoord) {
-	if (xCoord < 0 || yCoord < 0 || xCoord >= m || yCoord >= n) {
+	if (xCoord < 0 || yCoord < 0 || xCoord >= this.m || yCoord >= this.n) {
 		return false;
 	} 
 	return true;
 }
 
+// check if valid point
+Grid.prototype.ValidPoint = function(point) {
+	return this.isValidCoordinate(point.x, point.y);
+}
+
+// if point is in obstacles array, remove it
+Grid.prototype.removeObstacle = function(point) {
+ 	if (!this.ValidPoint(point)) return false; 
+  	for(var i = this.obstacles.length - 1; i>=0; i--) {
+  		if(this.obstacles[i].x == point.x && this.obstacles[i].y == point.y){
+  			obstacles.splice(i,1);
+  			return true;
+  		}
+  	}
+  	return false;
+}
+
+// add obstacle to obstacles array
+Grid.prototype.addObstacle = function(point) {
+ 	if (!this.ValidPoint(point)) return false; 
+  	this.obstacles.push(point);
+  	return true;
+}	
+
+// set coordinate in grid to be an obstacle by setting its status to VISITED
+Grid.prototype.setObstacles = function() {
+	for (var i = 0; i < this.obstacles.length; i++ )
+	{
+		this.grid[this.obstacles[i].x][this.obstacles[i].y] = Status.VISITED;
+	}
+
+}
+
+
 // SSP implemented using BFS
-// TODO: Implement serach using A* or Dijkstra instead?
-Grid.prototype.search = function(start, end)
+// TODO: Implement findPath using A* or Dijkstra instead?
+Grid.prototype.findPath = function(start, end)
 {
+	// re-initialize grid for every search
+	// TODO: better way to do this?
+	this.grid =[];
+
+	// error condition
+	if(!this.ValidPoint(start) || !this.ValidPoint(end)) return null;
+	
 	// Initialize status for BFS Search
 	for (var i = 0; i < this.n; ++i )
 	{
@@ -73,6 +100,9 @@ Grid.prototype.search = function(start, end)
 			this.grid[i][j] =  Status.UNVISITED;
 		}
 	}
+
+	// set obstacles
+	this.setObstacles();
 
     var paths = [];
 	paths.push([start]);
@@ -113,6 +143,7 @@ Grid.prototype.search = function(start, end)
 // Get UPPER-LEFT, UPPER-RIGHT, BOTTOM-LEFT, BUTTOM-RIGHT coordinates elements if diagonal is enabled
 Grid.prototype.getAdjacentCoordinates = function(coordinate)
 {
+
 	var xcoord= coordinate.x;
 	var ycoord = coordinate.y;
 
