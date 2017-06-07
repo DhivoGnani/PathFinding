@@ -31,7 +31,7 @@ function Grid(m,n)
 	this.diagonal = true;
 }
 
-Grid.prototype.diagonal = function(enable) {
+Grid.prototype.enableDiagonal = function(enable) {
 	this.diagonal = enable;
 }
 
@@ -65,10 +65,10 @@ Grid.prototype.isValidCoordinate = function(xCoord,yCoord) {
 Grid.prototype.search = function(start, end)
 {
 	// Initialize status for BFS Search
-	for (var i = 0; i < n; ++i )
+	for (var i = 0; i < this.n; ++i )
 	{
 		this.grid[i] = [];
-		for (var j = 0; j < m; ++j)
+		for (var j = 0; j < this.m; ++j)
 		{
 			this.grid[i][j] =  Status.UNVISITED;
 		}
@@ -97,7 +97,7 @@ Grid.prototype.search = function(start, end)
 
 			if (this.grid[xcoord][ycoord] == Status.UNVISITED) {
 				var newPath = path.slice();
-				newPath.push({x: xcoord, y: ycoord});
+				newPath.push(new Point(xcoord, ycoord));
 				this.grid[xcoord][ycoord] =  Status.VISITING;
 				paths.push(newPath);
 			}
@@ -154,7 +154,7 @@ Grid.prototype.getAdjacentCoordinates = function(coordinate)
 		}
 		// verify if bottom-right coordinate is within limits of grid 
 		if(xcoord+1 < this.m && ycoord+1 < this.n){
-			adjacentCoordinates.push({xcoord:xcoord+1, y:ycoord+1});
+			adjacentCoordinates.push({x:xcoord+1, y:ycoord+1});
 		}
 	}
 	return adjacentCoordinates;
