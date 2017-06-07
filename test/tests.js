@@ -1,4 +1,4 @@
 QUnit.test( "hello test", function( assert ) {
-	var grid = new Grid(5,5);
+	var point = new Point(1,2);
   	assert.ok( 1 == "1", "Passed!" );
 });

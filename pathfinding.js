@@ -8,67 +8,62 @@ var Status = {
 }
 
 /********** Points in Grid **********/ 
-function Point(xCoord, yCoord) {
-	this.x = xCoord;
-	this.y = yCoord;
-}
-
-Point.prototype.setX = function(xCoord) {
-	this.x = xCoord;
-}
-
-Point.prototype.setY = function(yCoord) {
-	this.y = yCoord;
-}
-
-Point.prototype.getX = function() {
-	return this.x;
-}
-
-Point.prototype.getY = function() {
-	return this.y;
+// JavaScript classes were introduced in ECMAScript 2015
+// TODO: use classes for Grid
+class Point{
+	constructor(xCoord,yCoord) {
+		this.x = xCoord;
+		this.y = yCoord;
+	}
 }
 
 /********** Grid **********/ 
 // Constructor
 function Grid(m,n)
 {
-	this.m = m;
+	// number of columns in grid
+	this.m = m; 
+	// number of rows in grid
 	this.n = n;
 	this.grid = [];
 	this.obstacles = [];
+	// path includes diagonal coordinates
+	this.diagonal = true;
 }
 
-Grid.prototype.isNotObstacle = function(xCoord, yCoord) {
-	if (isInvalidCoordinates(xCoord, yCoord)) return null;
-
-	for (var i = 0; i < this.obstacles.length; ++i) {
-		var obstacle = this.obstacles[i]
-		if (obstacle.x == xCoord && obstacle.y == yCoord) return false;
-	}
-	return true;
+Grid.prototype.diagonal = function(enable) {
+	this.diagonal = enable;
 }
 
-Grid.prototype.setObstacle = function(xCoord,yCoord) {
-	if (isInvalidCoordinates(xCoord, yCoord)) return false; 
+// Grid.prototype.isNotObstacle = function(xCoord, yCoord) {
+// 	if (!isValidCoordinate(xCoord, yCoord)) return null;
 
- 	var obstaclePoint = {x: xCoord, y:yCoord};
- 	this.obstacles.push(obstaclePoint);
- 	return true;
-}	
+// 	for (var i = 0; i < this.obstacles.length; ++i) {
+// 		var obstacle = this.obstacles[i]
+// 		if (obstacle.x == xCoord && obstacle.y == yCoord) return false;
+// 	}
+// 	return true;
+// }
 
-Grid.prototype.isInvalidCoordinates = function(xCoord,yCoord) {
-	if (xCoord < 0 || yCoord < 0 || xCoord > m || yCoord > n) {
-		return true;
+// Grid.prototype.setObstacle = function(xCoord,yCoord) {
+// 	if (!isValidCoordinate(xCoord, yCoord)) return false; 
+
+//  	var obstaclePoint = {x: xCoord, y:yCoord};
+//  	this.obstacles.push(obstaclePoint);
+//  	return true;
+// }	
+
+Grid.prototype.isValidCoordinate = function(xCoord,yCoord) {
+	if (xCoord < 0 || yCoord < 0 || xCoord >= m || yCoord >= n) {
+		return false;
 	} 
-	return false;
+	return true;
 }
 
 // SSP implemented using BFS
 // TODO: Implement serach using A* or Dijkstra instead?
 Grid.prototype.search = function(start, end)
 {
-	
 	// Initialize status for BFS Search
 	for (var i = 0; i < n; ++i )
 	{
@@ -81,29 +76,28 @@ Grid.prototype.search = function(start, end)
 
     var paths = [];
 	paths.push([start]);
-	this.grid[start.x][start.y] = VISITING;
-	
-	while (paths.length != 0)
-	{
+	this.grid[start.x][start.y] = Status.VISITING;
+
+	while (paths.length != 0) {
 		var path = paths.shift();
 
 		var last_node = path[path.length-1];
 
-		if ((last_node.x == end.x) && (last_node.y == end.y))
-		{
+		// path found from start to end
+		if ((last_node.x == end.x) && (last_node.y == end.y)) {
 			return path;
 		}
 
-		var x = this.getAdjacentElements(last_node);
-		for (var i = 0; i < x.length; ++i)
-		{
-			var xcoord = x[i].x;
-			var ycoord = x[i].y;
+		// get adjacent elements
+		var adj = this.getAdjacentCoordinates(last_node);
+		
+		for (var i = 0; i < adj.length; i++) {
+			var xcoord = adj[i].x;
+			var ycoord = adj[i].y;
 
-			if (this.grid[xcoord][ycoord] == Status.UNVISITED)
-			{
+			if (this.grid[xcoord][ycoord] == Status.UNVISITED) {
 				var newPath = path.slice();
-				newPath.push({x: x[i].x, y: x[i].y});
+				newPath.push({x: xcoord, y: ycoord});
 				this.grid[xcoord][ycoord] =  Status.VISITING;
 				paths.push(newPath);
 			}
@@ -113,36 +107,55 @@ Grid.prototype.search = function(start, end)
 
 	// No path from start to end
 	return null;
-
 }
 
-// Get TOP, BOTTOM, LEFT, RIGHT adjacent elements
-Grid.prototype.getAdjacentElements = function(last_node)
+// Get TOP, BOTTOM, LEFT, RIGHT adjacent coordinates
+// Get UPPER-LEFT, UPPER-RIGHT, BOTTOM-LEFT, BUTTOM-RIGHT coordinates elements if diagonal is enabled
+Grid.prototype.getAdjacentCoordinates = function(coordinate)
 {
-	var xcoord= last_node.x;
-	var ycoord = last_node.y;
+	var xcoord= coordinate.x;
+	var ycoord = coordinate.y;
 
+	var adjacentCoordinates = [];
 
-	var temp_array = [];
-	if (xcoord+1 < this.m)
-	{
-		temp_array.push({x:xcoord+1, y:ycoord});
+	// verify if coordinate to right is within limits of grid
+	if (xcoord+1 < this.m) {
+		adjacentCoordinates.push({x:xcoord+1, y:ycoord});
 	}
 
-	if (xcoord-1 >= 0)
-	{
-		temp_array.push({x:xcoord-1, y:ycoord});
+	// verify if coordinate to left is within limits of grid
+	if (xcoord-1 >= 0) {
+		adjacentCoordinates.push({x:xcoord-1, y:ycoord});
 	}
 
-    if (ycoord+1 < this.n)
-	{
-		temp_array.push({x:xcoord, y:ycoord+1});
+	// verify if coordinate below is within limits of grid
+    if (ycoord+1 < this.n) {
+		adjacentCoordinates.push({x:xcoord, y:ycoord+1});
 	}
 
-	if (ycoord-1 >= 0)
-	{
-		temp_array.push({x:xcoord, y:ycoord-1});
+	// verify if abpve above is within limits of grid
+	if (ycoord-1 >= 0) {
+		adjacentCoordinates.push({x:xcoord, y:ycoord-1});
 	}
 
-	return temp_array;
+	// verify that diagonal elements can be used
+	if (this.diagonal) {
+		// verify if upper-left coordinate is within limits of grid
+		if(xcoord-1 >= 0 && ycoord-1 >=0) {
+			adjacentCoordinates.push({x:xcoord-1 , y: ycoord-1})
+		}
+		// verify if upper-right coordinate is within limits of grid
+		if (xcoord+1 < this.m && ycoord-1 >=0) {
+			adjacentCoordinates.push({x:xcoord+1, y:ycoord-1});
+		}
+		// verify if bottom-left coordinate is within limits of grid
+		if(xcoord-1 >= 0 && ycoord+1 < this.n) {
+			adjacentCoordinates.push({x:xcoord-1, y:ycoord+1});
+		}
+		// verify if bottom-right coordinate is within limits of grid 
+		if(xcoord+1 < this.m && ycoord+1 < this.n){
+			adjacentCoordinates.push({xcoord:xcoord+1, y:ycoord+1});
+		}
+	}
+	return adjacentCoordinates;
 }
