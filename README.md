@@ -56,3 +56,11 @@ the shortest path between the two. I also realized the importance of path-findin
 Hence, I created this library.
 
 I use this library for the enemy's movement in level 2 of my [snake game](https://dhivognani.github.io/games/snake/snake.html)
+
+## Algorithm
+
+This library uses BFS to calculate the shortest path between two points.
+
+## Coming soon
+
+Implement A* and Dijkstra's SSP algorithms as part of library.
