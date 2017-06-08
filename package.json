@@ -1,6 +1,6 @@
 {
   "name": "path-finding",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "This is a pathfinding library that can be used in 2D game development",
   "main": "pathfinding.js",
   "directories": {
