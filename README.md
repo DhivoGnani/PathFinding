@@ -51,7 +51,7 @@ By default, diagonal points are included in the path. To disable diagonals, exec
 grid.addObstacke(new Point(1,1))
 ```
 
-Obstacles can be added to the grid. These points will not be returned when findPath is called.
+Obstacles can be added to the grid. These points will not be returned as part of shortest path for findPath.
 
 ```sh
 grid.removeObstacle(new Point(1,1))
