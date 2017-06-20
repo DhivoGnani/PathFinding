@@ -47,6 +47,18 @@ grid.enableDiagonal(false)
 
 By default, diagonal points are included in the path. To disable diagonals, execute the above statement.
 
+```sh
+grid.addObstacke(new Point(1,1))
+```
+
+Obstacles can be added to the grid. These points will not be returned when findPath is called.
+
+```sh
+grid.removeObstacle(new Point(1,1))
+```
+
+Obstacles can be removed from the grid. 
+
 ## Motivation
 
 I wished to create a JavaScript snake game where an enemy could chase the player. I realized I would need to find
